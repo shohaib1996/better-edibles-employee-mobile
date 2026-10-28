@@ -1,7 +1,8 @@
 {
   "expo": {
-    "name": "better-edibles-employee-mobile",
-    "slug": "better-edibles-employee-mobile",
+    "name": "Better Edibles Employee",
+    "slug": "better-edibles-employee",
+    "scheme": "betteredibles",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -10,21 +11,42 @@
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#fff8ec"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false,
+      "bundleIdentifier": "com.betteredibles.employee"
     },
     "android": {
+      "package": "com.betteredibles.employee",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#fff8ec"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
     "web": {
+      "bundler": "metro",
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-font",
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Better Edibles uses the microphone to record voice notes for your delivery stops."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Better Edibles checks your location once when you clock in or out. Never in the background."
+        }
+      ],
+      "expo-asset"
+    ]
   }
 }

@@ -1,0 +1,150 @@
+// Shapes returned by the Better Edibles backend's /api/employee-app routes.
+// Accounting owns hours, pay and PTO; the app only displays them.
+
+export interface Employee {
+  id: string;
+  name: string;
+  email: string | null;
+  employeeType: string;
+  isDriver: boolean;
+}
+
+export type ClockStatus = 'clocked_out' | 'clocked_in' | 'on_meal';
+export type ClockAction = 'clock-in' | 'clock-out' | 'meal-out' | 'meal-in';
+
+export interface ClockState {
+  status: ClockStatus;
+  clockInAt: string | null;
+  mealOutAt: string | null;
+  mealInAt: string | null;
+  canClockIn: boolean;
+  canClockOut: boolean;
+  canMealOut: boolean;
+  canMealIn: boolean;
+}
+
+export interface LocationSnapshot {
+  latitude: number;
+  longitude: number;
+  accuracyMeters?: number;
+  capturedAt: string;
+}
+
+export interface Punch {
+  id: string;
+  workDate: string;
+  clockIn: string;
+  mealOut: string | null;
+  mealIn: string | null;
+  clockOut: string | null;
+  open: boolean;
+  hours: number;
+  regularHours: number;
+  overtimeHours: number;
+}
+
+export interface WeekSummary {
+  payPeriodStart: string;
+  payPeriodEnd: string;
+  payDate: string;
+  payType: 'hourly' | 'salaried';
+  hourlyRate: number | null;
+  punches: Punch[];
+  totals: { hours: number; regularHours: number; overtimeHours: number };
+  estimatedGross: number | null;
+  approved: boolean;
+}
+
+export interface PayRun {
+  payPeriodStart: string;
+  payPeriodEnd: string;
+  payDate: string;
+  status: 'approved' | 'paid';
+  payType: 'hourly' | 'salaried';
+  hourlyRate: number;
+  regularHours: number;
+  overtimeHours: number;
+  totalHours: number;
+  hourlyPay: number;
+  salaryPay: number;
+  commission: number;
+  grossPay: number;
+}
+
+export interface PayHistory {
+  runs: PayRun[];
+  yearToDate: { year: number; grossPay: number; totalHours: number };
+}
+
+export interface Pto {
+  accruedDays: number;
+  usedDays: number;
+  availableDays: number;
+  annualDays: number;
+  eligible: boolean;
+  hireDate: string | null;
+}
+
+export interface Profile {
+  id: string;
+  name: string;
+  loginName: string;
+  email: string | null;
+  phone: string | null;
+  address: { street?: string; city?: string; state?: string; zip?: string } | null;
+  emergencyContact: { name?: string; relationship?: string; phone?: string } | null;
+  employeeType: string;
+  isDriver: boolean;
+  beEmployeeId: string | null;
+  payType: 'hourly' | 'salaried';
+  hourlyRate: number | null;
+}
+
+export interface MeResponse {
+  employee: Profile;
+  pto: Pto;
+  olccPermit: { status?: string } | null;
+}
+
+export interface HrDoc {
+  slug: string;
+  label: string;
+  order: number;
+  onFile: boolean;
+  filename: string | null;
+  uploadedAt: string | null;
+  hrStatus: string | null;
+  required: boolean | null;
+}
+
+export type DocStatus = 'completed' | 'pending' | 'missing';
+
+export interface Stop {
+  id: string;
+  order: number;
+  storeName: string;
+  address: string;
+  city: string;
+  state: string;
+  scheduledAt: string;
+  status: string;
+  done: boolean;
+  disposition: string[];
+  amount: number;
+  paymentAction: string;
+  orderNumber: number | null;
+  notes: string | null;
+  hasNote: boolean;
+}
+
+export interface Transcription {
+  transcript: string;
+  summary: string;
+}
+
+/** Error body the backend sends; `code: 'PIN_REQUIRED'` means the time clock needs the employee's PIN. */
+export interface ApiErrorBody {
+  message?: string;
+  error?: string;
+  code?: string;
+}
