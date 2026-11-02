@@ -124,6 +124,9 @@ export interface HrDoc {
   uploadedAt: string | null;
   hrStatus: string | null;
   required: boolean | null;
+  /** The blank form to print, fill in and sign; the same file for every employee. */
+  templateFilename: string | null;
+  templateAvailable: boolean;
 }
 
 export type DocStatus = 'completed' | 'pending' | 'missing';

@@ -48,6 +48,13 @@
           "locationWhenInUsePermission": "Better Edibles checks your location once when you clock in or out. Never in the background."
         }
       ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Better Edibles uses your photos so you can upload a signed form or a photo of your permit.",
+          "cameraPermission": "Better Edibles uses the camera so you can take a photo of a signed form or your permit."
+        }
+      ],
       "expo-asset"
     ]
   }

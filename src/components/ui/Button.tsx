@@ -2,7 +2,7 @@ import { ActivityIndicator, Pressable, type PressableProps } from 'react-native'
 import { Icon, type IconName } from './Icon';
 import { Txt } from './Txt';
 
-type Variant = 'primary' | 'green' | 'navy' | 'outline' | 'ghost' | 'danger';
+type Variant = 'primary' | 'green' | 'navy' | 'outline' | 'ghost' | 'danger' | 'danger-outline';
 const styles: Record<Variant, { box: string; text: string; icon: string }> = {
   primary: { box: 'bg-brand', text: 'text-white', icon: '#fff' },
   green: { box: 'bg-leaf', text: 'text-white', icon: '#fff' },
@@ -10,6 +10,7 @@ const styles: Record<Variant, { box: string; text: string; icon: string }> = {
   outline: { box: 'border-2 border-brand bg-white', text: 'text-brand', icon: '#f08a24' },
   ghost: { box: 'border-2 border-line bg-transparent', text: 'text-navy', icon: '#14325c' },
   danger: { box: 'bg-danger', text: 'text-white', icon: '#fff' },
+  'danger-outline': { box: 'border-2 border-danger/60 bg-white', text: 'text-danger', icon: '#d64545' },
 };
 
 export function Button({

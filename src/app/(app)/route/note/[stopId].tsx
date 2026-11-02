@@ -1,6 +1,6 @@
 import { RecordingPresets, requestRecordingPermissionsAsync, setAudioModeAsync, useAudioRecorder, useAudioRecorderState } from 'expo-audio';
 import { Redirect, router, useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Pressable, TextInput, View } from 'react-native';
 import { Art, BackBar, Button, Card, Icon, Notice, Screen, Txt } from '@/components/ui';
 import { errorMessage } from '@/lib/errors';
@@ -23,24 +23,49 @@ export default function VoiceNoteScreen() {
   const [transcript, setTranscript] = useState('');
   const [picking, setPicking] = useState(false);
   const [err, setErr] = useState('');
+  // Guards so a prepared recorder is never prepared twice (expo-audio throws
+  // "already prepared"), and so releasing the button before the recorder is
+  // ready still cleans up.
+  const startingRef = useRef(false);
+  const recordingRef = useRef(false);
+  const cancelRef = useRef(false);
 
   if (!isDriver) return <Redirect href="/" />;
   const stop = stops.find((s) => s.id === stopId);
 
+  // Frees a prepared/recording session so the next prepareToRecordAsync works.
+  async function releaseRecorder() {
+    try { if (recorder.isRecording) await recorder.stop(); else { recorder.record(); await recorder.stop(); } } catch { /* already free */ }
+    await setAudioModeAsync({ allowsRecording: false }).catch(() => {});
+  }
+
   async function start() {
-    setErr('');
-    const { granted } = await requestRecordingPermissionsAsync();
-    if (!granted) return setErr('Allow the microphone to record a note, or type it below.');
-    await setAudioModeAsync({ playsInSilentMode: true, allowsRecording: true });
-    await recorder.prepareToRecordAsync();
-    recorder.record();
+    if (startingRef.current || recordingRef.current) return; // ignore repeat presses
+    startingRef.current = true; cancelRef.current = false; setErr('');
+    try {
+      const { granted } = await requestRecordingPermissionsAsync();
+      if (!granted) { setErr('Allow the microphone to record a note, or type it below.'); return; }
+      await setAudioModeAsync({ playsInSilentMode: true, allowsRecording: true });
+      await recorder.prepareToRecordAsync();
+      if (cancelRef.current) { await releaseRecorder(); return; } // released before ready
+      recorder.record();
+      recordingRef.current = true;
+    } catch {
+      await releaseRecorder();
+      setErr('Could not start recording. Try again, or type your note below.');
+    } finally {
+      startingRef.current = false;
+    }
   }
 
   async function stopRecording() {
-    if (!recState.isRecording) return;
-    await recorder.stop();
-    await setAudioModeAsync({ allowsRecording: false });
-    if (!recorder.uri || recState.durationMillis < 800) return setErr('That was too short. Hold the button while you talk.');
+    if (startingRef.current) { cancelRef.current = true; return; } // still preparing
+    if (!recordingRef.current) return;
+    recordingRef.current = false;
+    const seconds = recorder.currentTime;
+    try { await recorder.stop(); } catch { /* already stopped */ }
+    await setAudioModeAsync({ allowsRecording: false }).catch(() => {});
+    if (!recorder.uri || seconds < 0.8) return setErr('That was too short. Hold the button while you talk.');
     try {
       const t = await transcribe({ uri: recorder.uri, mimeType: 'audio/mp4', name: 'note.m4a' }).unwrap();
       // The server answers "No speech detected." with an empty transcript; don't save that as the note.

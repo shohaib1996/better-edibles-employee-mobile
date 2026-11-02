@@ -19,9 +19,9 @@ export default function DocumentsScreen() {
       <View className="gap-3 rounded-3xl bg-[#fdf0d4] p-5">
         <Art name="docsHero" className="aspect-[2.15] w-full" />
         <Txt weight="heavy" className="text-2xl">Your paperwork, all in one place</Txt>
-        <Txt className="leading-5">These are your employment documents.{docs ? ` ${onFile} of ${docs.length} are on file with HR.` : ''}</Txt>
+        <Txt className="leading-5">Download the blank form, fill it in and have it signed, then upload the signed copy.{docs ? ` ${onFile} of ${docs.length} are on file with HR.` : ''}</Txt>
         <View className="flex-row justify-between">
-          {['Get the form from HR', 'Sign it', 'HR files it'].map((s, i) => (
+          {['Download the form', 'Sign it', 'Upload it'].map((s, i) => (
             <View key={s} className="flex-1 items-center gap-1">
               <View className="h-9 w-9 items-center justify-center rounded-full bg-brand"><Txt weight="heavy" className="text-white">{i + 1}</Txt></View>
               <Txt weight="heavy" className="text-center text-sm">{s}</Txt>

@@ -83,6 +83,10 @@ export const employeeApi = createApi({
     }),
 
     listDocs: b.query<HrDoc[], void>({ query: () => me('/documents'), transformResponse: (r: { documents: HrDoc[] }) => r.documents, providesTags: ['Docs'] }),
+    deleteDoc: b.mutation<{ success: boolean; message: string }, string>({
+      query: (slug) => ({ url: me(`/documents/${encodeURIComponent(slug)}`), method: 'DELETE' }),
+      invalidatesTags: ['Docs'],
+    }),
 
     getRoute: b.query<Stop[], string | void>({
       query: (date) => me(`/route${date ? `?date=${date}` : ''}`),
@@ -109,6 +113,6 @@ export const employeeApi = createApi({
 
 export const {
   useLoginMutation, useRequestPasswordResetMutation, useGetMeQuery, useGetClockStateQuery, usePunchMutation,
-  useGetWeekQuery, useGetPayHistoryQuery, useGetPayRunQuery, useListDocsQuery, useGetRouteQuery,
+  useGetWeekQuery, useGetPayHistoryQuery, useGetPayRunQuery, useListDocsQuery, useDeleteDocMutation, useGetRouteQuery,
   useMarkArrivedMutation, useTranscribeMutation, useSaveVoiceNoteMutation,
 } = employeeApi;
