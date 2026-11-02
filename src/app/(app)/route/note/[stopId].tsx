@@ -43,6 +43,8 @@ export default function VoiceNoteScreen() {
     if (!recorder.uri || recState.durationMillis < 800) return setErr('That was too short. Hold the button while you talk.');
     try {
       const t = await transcribe({ uri: recorder.uri, mimeType: 'audio/mp4', name: 'note.m4a' }).unwrap();
+      // The server answers "No speech detected." with an empty transcript; don't save that as the note.
+      if (!t.transcript.trim()) return setErr('I did not catch any words. Try again or type it.');
       setNote((n) => (n ? `${n}\n` : '') + t.summary);
       setTranscript((x) => (x ? `${x} ` : '') + t.transcript);
     } catch (e) { setErr(errorMessage(e, 'Could not hear that. Try again or type it.')); }

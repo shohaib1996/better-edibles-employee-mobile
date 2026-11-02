@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, type ComponentRef } from 'react';
 import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Art, Icon, StatusBadge, Txt } from '@/components/ui';
@@ -13,7 +13,7 @@ export function Buddy({ me, docs, production }: { me: MeResponse; docs: HrDoc[];
   const [open, setOpen] = useState(false);
   const [text, setText] = useState('');
   const [msgs, setMsgs] = useState<Msg[]>([{ me: false, text: 'Hi! Ask me about your OLCC permit, your HR documents or your PTO.' }]);
-  const scroll = useRef<ScrollView>(null);
+  const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
 
   const say = (q: string) => {
     if (!q.trim()) return;

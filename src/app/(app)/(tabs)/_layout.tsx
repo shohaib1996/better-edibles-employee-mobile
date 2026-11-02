@@ -1,8 +1,9 @@
 import { Tabs } from 'expo-router';
+import type { ColorValue } from 'react-native';
 import { Icon, type IconName } from '@/components/ui';
 import { useAppSelector } from '@/store';
 
-const icon = (name: IconName) => ({ color, size }: { color: string; size: number }) => <Icon name={name} color={color} size={size} />;
+const icon = (name: IconName) => function TabIcon({ color, size }: { color: ColorValue; size: number }) { return <Icon name={name} color={typeof color === 'string' ? color : undefined} size={size} />; };
 
 export default function TabsLayout() {
   const isDriver = useAppSelector((s) => !!s.auth.employee?.isDriver);

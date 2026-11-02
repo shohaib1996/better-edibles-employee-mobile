@@ -33,7 +33,7 @@ export default function RouteScreen() {
         <BackBar to="/choice" right={<View className="rounded-full bg-[#e7e7f2] px-4 py-1.5"><Txt weight="semi" className="text-sm text-navy-soft">Not clocked in</Txt></View>} />
         <Txt weight="heavy" className="text-5xl leading-tight">Ready to roll?</Txt>
         <Card>
-          <Txt weight="heavy" className="mb-3 text-xl">Today's route</Txt>
+          <Txt weight="heavy" className="mb-3 text-xl">Today&apos;s route</Txt>
           <View className="flex-row gap-2">
             {[[left.length, 'stops left'], [stops.length - left.length, 'done'], [stops.length, 'total']].map(([v, l]) => (
               <View key={l} className="flex-1 items-center rounded-2xl bg-[#eef5fc] py-3"><Txt weight="heavy" className="text-4xl">{v}</Txt><Txt className="text-sm">{l}</Txt></View>

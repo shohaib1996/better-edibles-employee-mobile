@@ -13,7 +13,7 @@ export default function TimeOffScreen() {
         <Txt weight="heavy" className="flex-1 text-4xl">Time Off</Txt>
         <Art name="timeoffArt" className="h-24 w-44" />
       </View>
-      <Notice kind="error">{error ? errorMessage(error) : ''}</Notice>
+      <Notice kind="error">{error ? errorMessage(error) : data && !pto ? data.accounting?.message ?? 'Your PTO is not available right now.' : ''}</Notice>
       {isLoading && <Loading />}
       {pto && (
         <>

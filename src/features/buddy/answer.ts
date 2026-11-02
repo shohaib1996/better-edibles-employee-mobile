@@ -15,6 +15,7 @@ export function buddyAnswer(q: string, me: MeResponse, docs: HrDoc[], production
   }
   if (/pto|vacation|time off|days off/.test(s)) {
     const p = me.pto;
+    if (!p) return { text: me.accounting?.message ?? 'Your PTO is not available right now. Try again shortly.' };
     return { text: p.eligible ? `You have ${days(p.availableDays)} of PTO left this year (${days(p.usedDays)} used of ${days(p.accruedDays)}).` : 'PTO starts after 6 months with the company.' };
   }
   if (/miss|need|left|todo|to do|document|form/.test(s)) {

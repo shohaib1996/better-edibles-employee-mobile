@@ -34,7 +34,7 @@ export default function PermitsScreen() {
             <View className="flex-1 items-center"><Art name="cardLicenseBack" className="aspect-[1.5] w-full rounded-lg" /><Txt className="text-xs text-muted">Back</Txt></View>
           </View>
           <View className="flex-1 gap-1">
-            <Txt weight="heavy" className="text-xl">Driver's license</Txt>
+            <Txt weight="heavy" className="text-xl">Driver&apos;s license</Txt>
             <Txt className="text-xs text-muted">{employee?.isDriver ? 'Required for drivers.' : 'Only needed if you drive for the company.'}</Txt>
           </View>
         </Card>

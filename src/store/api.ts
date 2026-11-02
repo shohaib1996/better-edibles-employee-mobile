@@ -100,7 +100,8 @@ export const employeeApi = createApi({
       transformResponse: (r: { transcript?: string; summary?: string }) => ({ transcript: r.transcript ?? '', summary: r.summary ?? r.transcript ?? '' }),
     }),
     saveVoiceNote: b.mutation<void, { stopId: string; note: string; transcript?: string }>({
-      query: ({ stopId, note, transcript }) => ({ url: '/api/voice-note/save', method: 'POST', body: { deliveryId: stopId, note, transcript } }),
+      // The driver-only route: the backend checks the stop is on this driver's route.
+      query: ({ stopId, note, transcript }) => ({ url: me(`/route/${stopId}/note`), method: 'POST', body: { note, transcript } }),
       invalidatesTags: ['Route'],
     }),
   }),

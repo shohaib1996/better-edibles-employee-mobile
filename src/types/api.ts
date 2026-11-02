@@ -100,10 +100,19 @@ export interface Profile {
   hourlyRate: number | null;
 }
 
+/** Whether the backend could reach this employee's Accounting record. */
+export interface AccountingLink {
+  linked: boolean;
+  available: boolean;
+  message: string | null;
+}
+
 export interface MeResponse {
   employee: Profile;
-  pto: Pto;
+  /** Null when Accounting is down or the employee is not linked to it yet. */
+  pto: Pto | null;
   olccPermit: { status?: string } | null;
+  accounting?: AccountingLink;
 }
 
 export interface HrDoc {
