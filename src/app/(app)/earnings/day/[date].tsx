@@ -1,6 +1,6 @@
 import { useLocalSearchParams } from 'expo-router';
 import { View } from 'react-native';
-import { Art, BackBar, Card, ComingSoon, Icon, Loading, Notice, Screen, Txt } from '@/components/ui';
+import { Art, BackBar, Card, ComingSoon, Gradient, Icon, Loading, Notice, Screen, Txt } from '@/components/ui';
 import { errorMessage } from '@/lib/errors';
 import { clockTime, dayLabel, money } from '@/lib/format';
 import { useGetWeekQuery } from '@/store/api';
@@ -20,11 +20,11 @@ export default function DayDetailScreen() {
       {isLoading && <Loading />}
       {week && (
         <>
-          <View className="h-48 items-center justify-center overflow-hidden rounded-3xl bg-[#fde3b8]">
+          <Gradient colors={['#fde3b8', '#fbeed0']} className="h-48 items-center justify-center overflow-hidden rounded-3xl">
             <Art name="homeMountains" className="absolute bottom-0 h-24 w-full" contentFit="cover" />
             <Txt weight="heavy" className="text-5xl">{hrs.toFixed(2)} hrs</Txt>
             <Txt weight="semi" className="text-2xl tracking-wide">{list.some((p) => p.open) ? 'so far' : 'worked'}</Txt>
-          </View>
+          </Gradient>
           {week.hourlyRate !== null && (
             <Card className="flex-row">
               <View className="flex-1 items-center"><Txt weight="heavy" className="text-xl">{money(week.hourlyRate)}</Txt><Txt className="text-sm text-navy-soft">rate</Txt></View>

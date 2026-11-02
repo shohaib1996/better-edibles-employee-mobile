@@ -1,6 +1,6 @@
 import { Link } from 'expo-router';
 import { Pressable, View } from 'react-native';
-import { Art, Txt } from '@/components/ui';
+import { Art, Gradient, Sun, Txt } from '@/components/ui';
 import { clockTime } from '@/lib/format';
 import type { ClockState } from '@/types/api';
 import type { PunchController } from './usePunch';
@@ -10,7 +10,9 @@ export function ClockCard({ clock, punch }: { clock?: ClockState; punch: PunchCo
   const heading = !clock ? 'Time clock' : clock.status === 'on_meal' ? `On meal since ${clockTime(clock.mealOutAt)}`
     : clock.status === 'clocked_in' ? `Clocked in since ${clockTime(clock.clockInAt)}` : 'Not clocked in';
   return (
-    <View className="overflow-hidden rounded-3xl bg-[#fde3b5]">
+    <Gradient colors={['#fbd2a2', '#fde3b5', '#ffeec4']} locations={[0, 0.45, 1]} angle={170} className="overflow-hidden rounded-3xl">
+      {/* The glowing sunrise sun, behind the content (web .clock-card .sun). */}
+      <Sun size={150} className="absolute bottom-1 right-[12%]" />
       <View className="gap-3 p-5 pb-24">
         <Link href="/clock" asChild><Pressable><Txt weight="heavy" className="text-2xl">{heading}</Txt></Pressable></Link>
         <View className="flex-row gap-2.5">
@@ -32,6 +34,6 @@ export function ClockCard({ clock, punch }: { clock?: ClockState; punch: PunchCo
         <Txt className="text-xs">Location is only checked when you clock in or out.</Txt>
       </View>
       <Art name="homeMountains" className="absolute bottom-0 h-24 w-full" contentFit="cover" />
-    </View>
+    </Gradient>
   );
 }

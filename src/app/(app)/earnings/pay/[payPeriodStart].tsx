@@ -1,6 +1,6 @@
 import { useLocalSearchParams } from 'expo-router';
 import { View } from 'react-native';
-import { Art, BackBar, Card, ComingSoon, Loading, Notice, Screen, Txt } from '@/components/ui';
+import { Art, BackBar, Card, ComingSoon, Gradient, Loading, Notice, Screen, Txt } from '@/components/ui';
 import { errorMessage } from '@/lib/errors';
 import { longDate, money, shortDate } from '@/lib/format';
 import { useGetPayRunQuery } from '@/store/api';
@@ -25,12 +25,12 @@ export default function PayWeekScreen() {
       {isLoading && <Loading />}
       {r && (
         <>
-          <View className="min-h-44 overflow-hidden rounded-3xl bg-[#fde3b8] p-5">
+          <Gradient colors={['#fde3b8', '#fbeed0']} className="min-h-44 overflow-hidden rounded-3xl p-5">
             <Art name="stubSky" className="absolute inset-0 h-full w-full opacity-90" contentFit="cover" />
             <Txt weight="semi">Gross pay</Txt>
             <Txt weight="heavy" className="text-5xl">{money(r.grossPay)}</Txt>
             <Txt weight="semi">{r.status === 'paid' ? 'Paid' : 'Pays'} {longDate(r.payDate)} · {shortDate(r.payPeriodStart)} – {shortDate(r.payPeriodEnd)}</Txt>
-          </View>
+          </Gradient>
           <Card>
             <Txt weight="heavy" className="mb-1 text-xl">Earnings</Txt>
             {r.payType === 'hourly' ? (

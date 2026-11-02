@@ -2,7 +2,7 @@ import { Link, Redirect, router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, Switch, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Art, BackBar, Button, Card, Icon, Loading, Notice, Screen, Txt } from '@/components/ui';
+import { Art, BackBar, Button, Card, Gradient, Icon, Loading, Notice, Screen, Txt } from '@/components/ui';
 import { PinPrompt } from '@/features/clock/PinPrompt';
 import { usePunch } from '@/features/clock/usePunch';
 import { openDirections, paymentLabel, stopTime } from '@/features/route/helpers';
@@ -29,7 +29,9 @@ export default function RouteScreen() {
   // Not clocked in yet: "Ready to roll?"
   if (clock.data?.status === 'clocked_out') {
     return (
-      <Screen onRefresh={() => { route.refetch(); clock.refetch(); }} className="bg-[#e8f3fd]">
+      <Screen onRefresh={() => { route.refetch(); clock.refetch(); }}>
+        {/* Blue dawn sky fading to cream, matching the web `.ready` background. */}
+        <Gradient colors={['#d9ecfb', '#f3f8fd', '#fff8ec']} locations={[0, 0.3, 0.6]} className="absolute -left-4 -right-4 -top-2 h-[420px]" />
         <BackBar to="/choice" right={<View className="rounded-full bg-[#e7e7f2] px-4 py-1.5"><Txt weight="semi" className="text-sm text-navy-soft">Not clocked in</Txt></View>} />
         <Txt weight="heavy" className="text-5xl leading-tight">Ready to roll?</Txt>
         <Card>

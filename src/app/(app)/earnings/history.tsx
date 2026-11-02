@@ -1,6 +1,6 @@
 import { Link } from 'expo-router';
 import { Pressable, View } from 'react-native';
-import { Art, BackBar, Card, Icon, Loading, Notice, Screen, Txt } from '@/components/ui';
+import { Art, BackBar, Card, Gradient, Icon, Loading, Notice, Screen, Txt } from '@/components/ui';
 import { errorMessage } from '@/lib/errors';
 import { days, longDate, money } from '@/lib/format';
 import { useGetMeQuery, useGetPayHistoryQuery } from '@/store/api';
@@ -18,7 +18,7 @@ export default function HistoryScreen() {
       <Notice kind="error">{history.error ? errorMessage(history.error) : ''}</Notice>
       {history.isLoading && <Loading />}
       {h && (
-        <View className="min-h-56 overflow-hidden rounded-3xl bg-[#fde6b8] p-5">
+        <Gradient colors={['#fff3d6', '#fde6b8']} angle={160} className="min-h-56 overflow-hidden rounded-3xl p-5">
           <Art name="historyArt" className="absolute bottom-0 right-0 h-full w-2/5" contentFit="cover" />
           <Txt weight="semi" className="mb-2">{h.yearToDate.year} so far</Txt>
           <View className="w-3/5 flex-row flex-wrap">
@@ -32,7 +32,7 @@ export default function HistoryScreen() {
               </View>
             ))}
           </View>
-        </View>
+        </Gradient>
       )}
       {pto && (
         <Card className="flex-row items-center gap-3">

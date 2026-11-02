@@ -2,7 +2,7 @@ import { Link, router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Art, Card, Icon, Loading, Notice, Screen, Txt } from '@/components/ui';
+import { Art, Card, Gradient, Icon, Loading, Notice, Screen, Txt } from '@/components/ui';
 import { byDay } from '@/features/earnings/byDay';
 import { errorMessage } from '@/lib/errors';
 import { addDays, dayLabel, days, money, shortDate, todayPacific } from '@/lib/format';
@@ -44,7 +44,7 @@ export default function EarningsScreen() {
               </Pressable>
             </View>
 
-            <View className="overflow-hidden rounded-3xl bg-[#fde6b8] p-5">
+            <Gradient colors={['#fff3d6', '#fde6b8']} angle={160} className="overflow-hidden rounded-3xl p-5">
               <Art name="earnArt" className="absolute right-0 top-2 h-28 w-3/5" />
               <Txt weight="semi" className="text-base">{current ? 'This week so far' : 'That week'}</Txt>
               <Txt weight="heavy" className="text-5xl">{w.estimatedGross !== null ? money(w.estimatedGross) : `${w.totals.hours.toFixed(2)} hrs`}</Txt>
@@ -56,7 +56,7 @@ export default function EarningsScreen() {
                 <Txt weight="heavy">{w.totals.hours.toFixed(2)} hrs</Txt>
                 <Txt>{w.totals.overtimeHours > 0 ? `${w.totals.overtimeHours.toFixed(2)} hrs overtime` : `${Math.max(0, 40 - w.totals.hours).toFixed(2)} hrs to 40`}</Txt>
               </View>
-            </View>
+            </Gradient>
 
             {pto && (
               <Pressable onPress={() => router.push('/time-off')}>

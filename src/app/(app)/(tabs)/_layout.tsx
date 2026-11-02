@@ -20,10 +20,10 @@ export default function TabsLayout() {
     >
       <Tabs.Screen name="index" options={{ title: 'Home', tabBarIcon: icon('home') }} />
       {/* Route is for drivers only. */}
-      <Tabs.Screen name="route" options={{ title: 'Route', tabBarIcon: icon('location'), href: isDriver ? undefined : null }} />
-      <Tabs.Screen name="earnings" options={{ title: 'Earnings', tabBarIcon: icon('cash') }} />
-      <Tabs.Screen name="time-off" options={{ title: 'Time Off', tabBarIcon: icon('calendar') }} />
-      <Tabs.Screen name="account" options={{ title: 'Account', tabBarIcon: icon('person') }} />
+      <Tabs.Screen name="route" options={{ title: 'Route', tabBarIcon: icon('route'), href: isDriver ? undefined : null }} />
+      <Tabs.Screen name="earnings" options={{ title: 'Earnings', tabBarIcon: icon('earnings') }} />
+      <Tabs.Screen name="time-off" options={{ title: 'Time Off', tabBarIcon: icon('timeoff') }} />
+      <Tabs.Screen name="account" options={{ title: 'Account', tabBarIcon: icon('account') }} />
     </Tabs>
   );
 }
