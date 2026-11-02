@@ -1,0 +1,33 @@
+{
+  "cli": {
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_API_BASE_URL": "https://api-backend.better-edibles.com",
+        "EXPO_PUBLIC_USE_RN_FETCH": "1"
+      }
+    },
+    "preview": {
+      "distribution": "internal",
+      "android": { "buildType": "apk" },
+      "env": {
+        "EXPO_PUBLIC_API_BASE_URL": "https://api-backend.better-edibles.com",
+        "EXPO_PUBLIC_USE_RN_FETCH": "1"
+      }
+    },
+    "production": {
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_API_BASE_URL": "https://api-backend.better-edibles.com",
+        "EXPO_PUBLIC_USE_RN_FETCH": "1"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}
