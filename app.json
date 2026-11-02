@@ -15,7 +15,7 @@
       "package": "com.betteredibles.employee",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#fff8ec"
+        "backgroundColor": "#0c1f2e"
       },
       "predictiveBackGestureEnabled": false,
       "permissions": [
