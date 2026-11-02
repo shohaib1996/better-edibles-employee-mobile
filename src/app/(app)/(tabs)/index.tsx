@@ -1,4 +1,5 @@
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
+import { useEffect } from 'react';
 import { Pressable, View } from 'react-native';
 import { Art, ComingSoon, Notice, Screen, Txt } from '@/components/ui';
 import { ClockCard } from '@/features/clock/ClockCard';
@@ -8,7 +9,8 @@ import type { ArtName } from '@/lib/art';
 import { errorMessage } from '@/lib/errors';
 import { firstName } from '@/lib/format';
 import { useGetClockStateQuery, useListDocsQuery } from '@/store/api';
-import { useAppSelector } from '@/store';
+import { landingConsumed } from '@/store/authSlice';
+import { useAppDispatch, useAppSelector } from '@/store';
 
 function Tile({ href, art, title, sub, bg }: { href: '/documents' | '/earnings' | '/time-off' | '/account'; art: ArtName; title: string; sub: string; bg: string }) {
   return (
@@ -23,7 +25,18 @@ function Tile({ href, art, title, sub, bg }: { href: '/documents' | '/earnings' 
 }
 
 export default function HomeScreen() {
+  const dispatch = useAppDispatch();
   const employee = useAppSelector((s) => s.auth.employee);
+  const landing = useAppSelector((s) => s.auth.landing);
+
+  // Fresh sign-in for a driver: send them to the Driving/HR choice once. Done
+  // here (not in login) so the navigator is mounted and the redirect can't race.
+  useEffect(() => {
+    if (landing === 'choice') {
+      dispatch(landingConsumed());
+      router.replace('/choice');
+    }
+  }, [landing, dispatch]);
   const clock = useGetClockStateQuery();
   const docs = useListDocsQuery();
   const punch = usePunch();

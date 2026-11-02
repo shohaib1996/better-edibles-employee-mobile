@@ -1,4 +1,3 @@
-import { router } from 'expo-router';
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -27,8 +26,10 @@ export default function LoginScreen() {
     try {
       const r = await login({ loginName: loginName.trim(), password }).unwrap();
       await tokenStorage.set(r.token);
+      // The signed-in guard mounts the app on its own; drivers are sent to the
+      // Driving/HR choice from Home (via the one-shot `landing` flag). Navigating
+      // here would race the guard and drop drivers on Home.
       dispatch(signedIn(r));
-      router.replace(r.employee.isDriver ? '/choice' : '/');
     } catch (e) { setError(errorMessage(e, 'Could not sign in.')); }
   }
 

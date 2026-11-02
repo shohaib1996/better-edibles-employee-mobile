@@ -1,6 +1,6 @@
 import { Link, Redirect, router } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, Switch, View } from 'react-native';
+import { Alert, Pressable, Switch, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Art, BackBar, Button, Card, Gradient, Icon, Loading, Notice, Screen, Txt } from '@/components/ui';
 import { PinPrompt } from '@/features/clock/PinPrompt';
@@ -72,6 +72,13 @@ export default function RouteScreen() {
     setErr('');
     try { await markArrived(id).unwrap(); } catch (e) { setErr(errorMessage(e, 'Could not update the stop.')); }
   }
+  // Completing a stop ships its order and can't be undone from the app, so confirm first.
+  function confirmArrived(id: string, name: string) {
+    Alert.alert('Mark this stop delivered?', `This completes ${name} and tells the office it shipped. You can't undo it here.`, [
+      { text: 'Not yet', style: 'cancel' },
+      { text: 'Yes, delivered', onPress: () => arrived(id) },
+    ]);
+  }
 
   return (
     <View className="flex-1 bg-cream">
@@ -111,7 +118,7 @@ export default function RouteScreen() {
               {next.notes && <View className="flex-row items-center gap-3 py-2"><Icon name="document-text-outline" color="#f08a24" /><Txt className="flex-1">{next.notes}</Txt></View>}
               <View className="mt-2 flex-row gap-2">
                 <Button title="Navigate" icon="navigate" className="flex-1" onPress={() => openDirections(next)} />
-                <Button title="I've arrived" icon="checkmark-circle" variant="green" className="flex-1" loading={arriving.isLoading} onPress={() => arrived(next.id)} />
+                <Button title="I've arrived" icon="checkmark-circle" variant="green" className="flex-1" loading={arriving.isLoading} onPress={() => confirmArrived(next.id, next.storeName)} />
               </View>
               <View className="mt-3 flex-row justify-center gap-2.5">
                 {stops.map((s) => <View key={s.id} className={`h-3.5 w-3.5 rounded-full ${s.done || s.id === next.id ? 'bg-brand' : 'bg-[#ccd2dc]'}`} />)}

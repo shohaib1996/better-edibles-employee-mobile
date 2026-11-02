@@ -9,7 +9,8 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Provider } from 'react-redux';
 import { tokenStorage } from '@/lib/tokenStorage';
 import { employeeApi } from '@/store/api';
-import { employeeLoaded, signedOut, tokenRestored } from '@/store/authSlice';
+import { employeeLoaded, sessionResumed, tokenRestored } from '@/store/authSlice';
+import type { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 import { store, useAppDispatch, useAppSelector } from '@/store';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
@@ -26,9 +27,11 @@ function useBootstrap() {
       if (res.data) {
         const e = res.data.employee;
         dispatch(employeeLoaded({ id: e.id, name: e.name, email: e.email, employeeType: e.employeeType, isDriver: e.isDriver }));
-      } else {
-        // A 401 already signed out; anything else (offline) also lands on login.
-        dispatch(signedOut());
+      } else if ((res.error as FetchBaseQueryError | undefined)?.status !== 401) {
+        // Offline or a server error, but the saved token is still valid: open the
+        // app and let screens load/retry, instead of forcing a re-login.
+        // (A 401 was already handled by the base query, which clears the token.)
+        dispatch(sessionResumed());
       }
     })();
   }, [dispatch]);
