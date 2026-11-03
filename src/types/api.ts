@@ -131,6 +131,17 @@ export interface HrDoc {
 
 export type DocStatus = 'completed' | 'pending' | 'missing';
 
+/** A photo of a work permit or ID card the employee has uploaded. */
+export interface PermitCard {
+  slug: string;
+  order: number;
+  label: string;
+  onFile: boolean;
+  filename: string | null;
+  mimeType: string | null;
+  uploadedAt: string | null;
+}
+
 export interface Stop {
   id: string;
   order: number;

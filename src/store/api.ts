@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery, type BaseQueryFn, type FetchArgs, type Fetch
 import { API_BASE_URL } from '@/lib/config';
 import { tokenStorage } from '@/lib/tokenStorage';
 import type {
-  ClockAction, ClockState, Employee, HrDoc, LocationSnapshot, MeResponse, PayHistory, PayRun, Stop, Transcription, WeekSummary,
+  ClockAction, ClockState, Employee, HrDoc, LocationSnapshot, MeResponse, PayHistory, PayRun, PermitCard, Stop, Transcription, WeekSummary,
 } from '@/types/api';
 import { signedOut } from './authSlice';
 import type { RootState } from './index';
@@ -39,7 +39,7 @@ const me = (path = '') => `/api/employee-app/me${path}`;
 export const employeeApi = createApi({
   reducerPath: 'employeeApi',
   baseQuery,
-  tagTypes: ['Me', 'Clock', 'Week', 'Pay', 'Docs', 'Route'],
+  tagTypes: ['Me', 'Clock', 'Week', 'Pay', 'Docs', 'Cards', 'Route'],
   endpoints: (b) => ({
     login: b.mutation<{ token: string; employee: Employee }, { loginName: string; password: string }>({
       query: ({ loginName, password }) => ({ url: '/api/employee-auth/login', method: 'POST', body: { email: loginName, password } }),
@@ -88,6 +88,8 @@ export const employeeApi = createApi({
       invalidatesTags: ['Docs'],
     }),
 
+    listCards: b.query<PermitCard[], void>({ query: () => me('/cards'), transformResponse: (r: { cards: PermitCard[] }) => r.cards, providesTags: ['Cards'] }),
+
     getRoute: b.query<Stop[], string | void>({
       query: (date) => me(`/route${date ? `?date=${date}` : ''}`),
       transformResponse: (r: { stops: Stop[] }) => r.stops,
@@ -113,6 +115,6 @@ export const employeeApi = createApi({
 
 export const {
   useLoginMutation, useRequestPasswordResetMutation, useGetMeQuery, useGetClockStateQuery, usePunchMutation,
-  useGetWeekQuery, useGetPayHistoryQuery, useGetPayRunQuery, useListDocsQuery, useDeleteDocMutation, useGetRouteQuery,
+  useGetWeekQuery, useGetPayHistoryQuery, useGetPayRunQuery, useListDocsQuery, useDeleteDocMutation, useListCardsQuery, useGetRouteQuery,
   useMarkArrivedMutation, useTranscribeMutation, useSaveVoiceNoteMutation,
 } = employeeApi;
