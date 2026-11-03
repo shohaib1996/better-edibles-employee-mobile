@@ -1,12 +1,10 @@
 import { router, type Href } from 'expo-router';
-import { useState } from 'react';
-import { Pressable, View } from 'react-native';
-import { Art, Button, Card, Icon, Notice, Screen, Txt } from '@/components/ui';
+import { Alert, Pressable, View } from 'react-native';
+import { Art, Button, Card, Icon, Screen, Txt } from '@/components/ui';
 import type { ArtName } from '@/lib/art';
-import { errorMessage } from '@/lib/errors';
 import { permitStatus } from '@/lib/format';
 import { tokenStorage } from '@/lib/tokenStorage';
-import { employeeApi, useGetMeQuery, useRequestPasswordResetMutation } from '@/store/api';
+import { employeeApi, useGetMeQuery } from '@/store/api';
 import { signedOut } from '@/store/authSlice';
 import { useAppDispatch, useAppSelector } from '@/store';
 import type { Profile } from '@/types/api';
@@ -36,17 +34,14 @@ export default function AccountScreen() {
   const dispatch = useAppDispatch();
   const employee = useAppSelector((s) => s.auth.employee);
   const { data } = useGetMeQuery();
-  const [requestReset] = useRequestPasswordResetMutation();
-  const [msg, setMsg] = useState(''); const [err, setErr] = useState('');
   const p = data?.employee;
   const done = p ? profileChecks(p).filter((v) => String(v ?? '').trim()).length : 0;
   const permit = data?.olccPermit?.status;
   const ps = permitStatus(permit);
 
-  async function changePassword() {
-    setMsg(''); setErr('');
-    if (!p?.email) return setErr('There is no email on your account. Ask HR to add one so you can reset your password.');
-    try { setMsg(`${await requestReset(p.email).unwrap()} Check ${p.email}.`); } catch (e) { setErr(errorMessage(e, 'Could not send the email.')); }
+  // Passwords are changed by an admin, not from the app.
+  function changePassword() {
+    Alert.alert('Change password', 'Please ask Steven to change your password.', [{ text: 'OK' }]);
   }
   async function signOut() {
     await tokenStorage.clear();
@@ -72,12 +67,10 @@ export default function AccountScreen() {
           <Txt weight="heavy" className={`text-xs ${ps === 'completed' ? 'text-white' : ps === 'pending' ? 'text-brand-dark' : 'text-[#5d6575]'}`}>OLCC permit: {permit ?? 'not on file'}</Txt>
         </View>
       </Row>
-      <Row art="acctLock" title="Change password" sub="We email you a reset link" onPress={changePassword} />
+      <Row art="acctLock" title="Change password" sub="Ask Steven to change it" onPress={changePassword} />
       <Row art="acctFinger" title="Fingerprint sign-in" sub="Coming soon" />
       <Row art="acctCloud" title="App updates" sub="Version 1.0 · updates come through the app store" />
       <Row art="acctHr" title="HR documents" href="/documents" />
-      <Notice kind="error">{err}</Notice>
-      <Notice kind="ok">{msg}</Notice>
       <Button title="Sign out" icon="log-out-outline" variant="outline" onPress={signOut} className="mx-6 mt-2" />
     </Screen>
   );
