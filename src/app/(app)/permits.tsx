@@ -1,12 +1,12 @@
 import { Image } from 'expo-image';
 import { useState } from 'react';
-import { Alert, Pressable, View } from 'react-native';
+import { ActivityIndicator, Alert, Pressable, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Art, BackBar, Button, Card, Icon, Loading, Notice, Screen, StatusBadge, Txt } from '@/components/ui';
 import { Buddy } from '@/features/buddy/Buddy';
 import { API_BASE_URL } from '@/lib/config';
 import type { ArtName } from '@/lib/art';
-import { downloadAndShare } from '@/lib/download';
+import { saveToDevice } from '@/lib/download';
 import { errorMessage } from '@/lib/errors';
 import { permitStatus } from '@/lib/format';
 import { pickFile, pickFromLibrary, takePhoto, type PickedFile, uploadFile } from '@/lib/upload';
@@ -59,8 +59,10 @@ export default function PermitsScreen() {
     const card = cardOf(slug);
     if (!card?.onFile || !token) return;
     setErr(''); setDlSlug(slug);
-    try { await downloadAndShare(`/api/employee-app/me/cards/${slug}/download`, token, card.filename ?? `${slug}.jpg`); }
-    catch (e) { setErr(errorMessage(e, 'Could not open the file.')); }
+    try {
+      const result = await saveToDevice(`/api/employee-app/me/cards/${slug}/download`, token, card.filename ?? `${slug}.jpg`, card.mimeType);
+      if (result === 'saved') Alert.alert('Saved', 'The photo was saved to your Photos.');
+    } catch (e) { setErr(errorMessage(e, 'Could not download the file.')); }
     finally { setDlSlug(null); }
   }
 
@@ -103,9 +105,14 @@ export default function PermitsScreen() {
             <Txt className="text-xs leading-4 text-muted">{note}</Txt>
           </View>
         </View>
-        <View className="flex-row gap-2">
-          <Button title={busySlug === slug ? 'Uploading...' : on ? 'Replace photo' : 'Add photo'} icon="camera" variant={on ? 'outline' : 'green'} disabled={!!busySlug} onPress={() => choose(slug)} className="flex-1 rounded-2xl" />
-          {on && <Button title={dlSlug === slug ? 'Opening...' : 'View / save'} icon="download-outline" variant="green" loading={dlSlug === slug} onPress={() => view(slug)} className="flex-1 rounded-2xl" />}
+        <View className="flex-row items-stretch gap-2">
+          <Button title={busySlug === slug ? 'Uploading...' : on ? 'Replace' : 'Add photo'} icon="camera" variant={on ? 'outline' : 'green'} size="md" disabled={!!busySlug} onPress={() => choose(slug)} className="flex-1" />
+          {on && (
+            <Pressable onPress={() => view(slug)} disabled={!!dlSlug} accessibilityLabel="Download or view photo"
+              className={`w-14 items-center justify-center rounded-full bg-leaf ${dlSlug ? 'opacity-60' : 'active:opacity-80'}`}>
+              {dlSlug === slug ? <ActivityIndicator color="#fff" /> : <Icon name="download-outline" color="#fff" size={22} />}
+            </Pressable>
+          )}
         </View>
       </Card>
     );

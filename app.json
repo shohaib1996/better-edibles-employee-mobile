@@ -63,6 +63,13 @@
           "cameraPermission": "Better Edibles uses the camera so you can take a photo of a signed form or your permit."
         }
       ],
+      [
+        "expo-media-library",
+        {
+          "savePhotosPermission": "Better Edibles saves your permit and card photos to your Photos.",
+          "photosPermission": "Better Edibles needs access to your photos to save your permit and card images."
+        }
+      ],
       "expo-asset"
     ],
     "extra": {
