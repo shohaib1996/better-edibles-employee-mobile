@@ -1,4 +1,5 @@
-import { Link, Redirect } from 'expo-router';
+import { Link, Redirect, useFocusEffect } from 'expo-router';
+import { useCallback } from 'react';
 import { Pressable, View } from 'react-native';
 import { BackBar, Card, Icon, Loading, Notice, Screen, Txt } from '@/components/ui';
 import { stopTime } from '@/features/route/helpers';
@@ -8,7 +9,9 @@ import { useAppSelector } from '@/store';
 
 export default function StopsScreen() {
   const isDriver = useAppSelector((s) => !!s.auth.employee?.isDriver);
-  const { data: stops = [], error, isLoading, refetch } = useGetRouteQuery(undefined, { skip: !isDriver });
+  // Keep the order in sync with the admin (Today's Contact) reorders.
+  const { data: stops = [], error, isLoading, refetch } = useGetRouteQuery(undefined, { skip: !isDriver, pollingInterval: 30000, refetchOnMountOrArgChange: true });
+  useFocusEffect(useCallback(() => { if (isDriver) refetch(); }, [isDriver, refetch]));
   if (!isDriver) return <Redirect href="/" />;
   const done = stops.filter((s) => s.done).length;
   const nextId = stops.find((s) => !s.done)?.id;

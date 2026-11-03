@@ -1,6 +1,6 @@
-import { Link, Redirect, router } from 'expo-router';
-import { useState } from 'react';
-import { Alert, Pressable, Switch, View } from 'react-native';
+import { Link, Redirect, router, useFocusEffect } from 'expo-router';
+import { useCallback, useState } from 'react';
+import { Alert, Pressable, View } from 'react-native'; // Switch removed with the Navigator (coming soon)
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Art, BackBar, Button, Card, Gradient, Icon, Loading, Notice, Screen, Txt } from '@/components/ui';
 import { PinPrompt } from '@/features/clock/PinPrompt';
@@ -13,12 +13,18 @@ import { useAppSelector } from '@/store';
 
 export default function RouteScreen() {
   const isDriver = useAppSelector((s) => !!s.auth.employee?.isDriver);
-  const route = useGetRouteQuery(undefined, { skip: !isDriver });
+  // Stop order is set in the admin (Today's Contact); refresh every time this
+  // screen is shown and every 30s while it is open, so reorders show up here.
+  const route = useGetRouteQuery(undefined, { skip: !isDriver, pollingInterval: 30000, refetchOnMountOrArgChange: true });
+  const { refetch: refetchRoute } = route;
+  useFocusEffect(useCallback(() => { if (isDriver) refetchRoute(); }, [isDriver, refetchRoute]));
   const clock = useGetClockStateQuery(undefined, { skip: !isDriver });
   const [markArrived, arriving] = useMarkArrivedMutation();
   const punch = usePunch();
-  const [navigatorOn, setNavigatorOn] = useState(true); // the Navigator voice agent runs on the server
-  const [msg, setMsg] = useState(''); const [err, setErr] = useState('');
+  // Navigator voice assistant — coming soon; disabled for now, re-enable when built.
+  // const [navigatorOn, setNavigatorOn] = useState(true);
+  // const [msg, setMsg] = useState('');
+  const [err, setErr] = useState('');
 
   if (!isDriver) return <Redirect href="/" />;
   if (route.isLoading || clock.isLoading) return <Screen><Loading /></Screen>;
@@ -43,6 +49,7 @@ export default function RouteScreen() {
           </View>
         </Card>
         <Art name="routeMap" className="-mx-4 aspect-[1.68]" contentFit="cover" />
+        {/* Navigator voice assistant — coming soon, hidden for now.
         <Card className="flex-row items-center gap-3">
           <Art name="navigator" className="h-16 w-16" />
           <View className="flex-1 gap-1">
@@ -56,8 +63,9 @@ export default function RouteScreen() {
             <Icon name="mic" color="#fff" size={26} /><Txt weight="heavy" className="text-xs text-white">Talk</Txt>
           </Pressable>
         </Card>
+        */}
         <Notice kind="error">{punch.error || loadError}</Notice>
-        <Notice kind="ok">{msg}</Notice>
+        {/* <Notice kind="ok">{msg}</Notice> */}
         <PinPrompt punch={punch} />
         <Button title="Clock in & start route" variant="green" loading={punch.busy === 'clock-in'} onPress={() => punch.run('clock-in')} />
         <Pressable onPress={() => router.replace('/choice')} className="items-center py-2"><Txt weight="semi" className="text-muted underline">Not now</Txt></Pressable>
@@ -95,11 +103,13 @@ export default function RouteScreen() {
       </View>
       <Screen edges={[]} onRefresh={route.refetch} contentClassName="-mt-4">
         <Card className="gap-2">
+          {/* Navigator voice assistant — coming soon, hidden for now.
           <View className="flex-row items-center justify-end gap-2">
             <Art name="lion" className="h-14 w-14" />
             <Txt weight="heavy" className="text-sm">Navigator</Txt>
             <Switch value={navigatorOn} onValueChange={setNavigatorOn} trackColor={{ true: '#2e9d5b', false: '#ccd2dc' }} thumbColor="#fff" />
           </View>
+          */}
           {next ? (
             <>
               <Txt className="text-lg text-muted">next stop</Txt>
