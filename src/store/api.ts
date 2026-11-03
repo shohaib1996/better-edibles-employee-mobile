@@ -54,6 +54,14 @@ export const employeeApi = createApi({
     }),
 
     getMe: b.query<MeResponse, void>({ query: () => me(), providesTags: ['Me'] }),
+    updateProfile: b.mutation<void, {
+      phone?: string;
+      address?: { street?: string; city?: string; state?: string; zip?: string };
+      emergencyContact?: { name?: string; relationship?: string; phone?: string };
+    }>({
+      query: (body) => ({ url: me('/profile'), method: 'PATCH', body }),
+      invalidatesTags: ['Me'],
+    }),
 
     getClockState: b.query<ClockState, void>({ query: () => me('/timeclock/state'), transformResponse: toClock, providesTags: ['Clock'] }),
     punch: b.mutation<ClockState, { action: ClockAction; location?: LocationSnapshot; pin?: string }>({
@@ -114,7 +122,7 @@ export const employeeApi = createApi({
 });
 
 export const {
-  useLoginMutation, useRequestPasswordResetMutation, useGetMeQuery, useGetClockStateQuery, usePunchMutation,
+  useLoginMutation, useRequestPasswordResetMutation, useGetMeQuery, useUpdateProfileMutation, useGetClockStateQuery, usePunchMutation,
   useGetWeekQuery, useGetPayHistoryQuery, useGetPayRunQuery, useListDocsQuery, useDeleteDocMutation, useListCardsQuery, useGetRouteQuery,
   useMarkArrivedMutation, useTranscribeMutation, useSaveVoiceNoteMutation,
 } = employeeApi;

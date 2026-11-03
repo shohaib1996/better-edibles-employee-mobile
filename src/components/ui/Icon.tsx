@@ -28,6 +28,7 @@ const glyphs = {
   'alert-circle': { d: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7.5v6M12 16.5v.5' },
   navigate: { d: 'M3 11 21 3l-8 18-2-8z', fill: true },
   save: { d: 'M5 4h11l3 3v13H5zM8 4v5h7V4M8 20v-6h8v6' },
+  pencil: { d: 'M4 20h4L19 9l-4-4L4 16v4zM14 6l4 4' },
   refresh: { d: 'M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5' },
   send: { d: 'M21 3 3 10.5l7 2.5 2.5 7z' },
   close: { d: 'M6 6l12 12M18 6 6 18' },
