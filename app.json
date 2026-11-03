@@ -70,7 +70,8 @@
           "photosPermission": "Better Edibles needs access to your photos to save your permit and card images."
         }
       ],
-      "expo-asset"
+      "expo-asset",
+      "@react-native-community/datetimepicker"
     ],
     "extra": {
       "router": {

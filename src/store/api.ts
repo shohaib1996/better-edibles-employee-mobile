@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery, type BaseQueryFn, type FetchArgs, type Fetch
 import { API_BASE_URL } from '@/lib/config';
 import { tokenStorage } from '@/lib/tokenStorage';
 import type {
-  ClockAction, ClockState, Employee, HrDoc, LocationSnapshot, MeResponse, PayHistory, PayRun, PermitCard, Stop, Transcription, WeekSummary,
+  ClockAction, ClockState, Employee, HrDoc, LocationSnapshot, MeResponse, PayHistory, PayRun, PermitCard, Stop, TimeOffRequest, Transcription, WeekSummary,
 } from '@/types/api';
 import { signedOut } from './authSlice';
 import type { RootState } from './index';
@@ -39,7 +39,7 @@ const me = (path = '') => `/api/employee-app/me${path}`;
 export const employeeApi = createApi({
   reducerPath: 'employeeApi',
   baseQuery,
-  tagTypes: ['Me', 'Clock', 'Week', 'Pay', 'Docs', 'Cards', 'Route'],
+  tagTypes: ['Me', 'Clock', 'Week', 'Pay', 'Docs', 'Cards', 'TimeOff', 'Route'],
   endpoints: (b) => ({
     login: b.mutation<{ token: string; employee: Employee }, { loginName: string; password: string }>({
       query: ({ loginName, password }) => ({ url: '/api/employee-auth/login', method: 'POST', body: { email: loginName, password } }),
@@ -98,6 +98,16 @@ export const employeeApi = createApi({
 
     listCards: b.query<PermitCard[], void>({ query: () => me('/cards'), transformResponse: (r: { cards: PermitCard[] }) => r.cards, providesTags: ['Cards'] }),
 
+    listTimeOff: b.query<TimeOffRequest[], void>({ query: () => me('/time-off'), transformResponse: (r: { requests: TimeOffRequest[] }) => r.requests, providesTags: ['TimeOff'] }),
+    createTimeOff: b.mutation<void, { startDate: string; endDate: string; note?: string }>({
+      query: (body) => ({ url: me('/time-off'), method: 'POST', body }),
+      invalidatesTags: ['TimeOff'],
+    }),
+    cancelTimeOff: b.mutation<void, string>({
+      query: (id) => ({ url: me(`/time-off/${id}`), method: 'DELETE' }),
+      invalidatesTags: ['TimeOff'],
+    }),
+
     getRoute: b.query<Stop[], string | void>({
       query: (date) => me(`/route${date ? `?date=${date}` : ''}`),
       transformResponse: (r: { stops: Stop[] }) => r.stops,
@@ -124,5 +134,6 @@ export const employeeApi = createApi({
 export const {
   useLoginMutation, useRequestPasswordResetMutation, useGetMeQuery, useUpdateProfileMutation, useGetClockStateQuery, usePunchMutation,
   useGetWeekQuery, useGetPayHistoryQuery, useGetPayRunQuery, useListDocsQuery, useDeleteDocMutation, useListCardsQuery, useGetRouteQuery,
+  useListTimeOffQuery, useCreateTimeOffMutation, useCancelTimeOffMutation,
   useMarkArrivedMutation, useTranscribeMutation, useSaveVoiceNoteMutation,
 } = employeeApi;

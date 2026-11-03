@@ -142,6 +142,16 @@ export interface PermitCard {
   uploadedAt: string | null;
 }
 
+export interface TimeOffRequest {
+  id: string;
+  startDate: string; // YYYY-MM-DD
+  endDate: string;   // YYYY-MM-DD, inclusive
+  days: number;
+  note: string | null;
+  status: 'pending' | 'approved' | 'denied';
+  createdAt: string;
+}
+
 export interface Stop {
   id: string;
   order: number;
