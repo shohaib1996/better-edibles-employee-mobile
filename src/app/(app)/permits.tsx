@@ -2,10 +2,11 @@ import { Image } from 'expo-image';
 import { useState } from 'react';
 import { Alert, Pressable, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Art, BackBar, Card, Loading, Notice, Screen, StatusBadge, Txt } from '@/components/ui';
+import { Art, BackBar, Button, Card, Icon, Loading, Notice, Screen, StatusBadge, Txt } from '@/components/ui';
 import { Buddy } from '@/features/buddy/Buddy';
 import { API_BASE_URL } from '@/lib/config';
 import type { ArtName } from '@/lib/art';
+import { downloadAndShare } from '@/lib/download';
 import { errorMessage } from '@/lib/errors';
 import { permitStatus } from '@/lib/format';
 import { pickFile, pickFromLibrary, takePhoto, type PickedFile, uploadFile } from '@/lib/upload';
@@ -32,6 +33,7 @@ export default function PermitsScreen() {
   const cards = cardsQ.data ?? [];
   const cardOf = (slug: string) => cards.find((c) => c.slug === slug);
   const [busySlug, setBusySlug] = useState<string | null>(null);
+  const [dlSlug, setDlSlug] = useState<string | null>(null);
   const [err, setErr] = useState('');
 
   async function run(slug: string, pick: () => Promise<PickedFile | null>) {
@@ -53,25 +55,61 @@ export default function PermitsScreen() {
       { text: 'Cancel', style: 'cancel' },
     ]);
   }
+  async function view(slug: string) {
+    const card = cardOf(slug);
+    if (!card?.onFile || !token) return;
+    setErr(''); setDlSlug(slug);
+    try { await downloadAndShare(`/api/employee-app/me/cards/${slug}/download`, token, card.filename ?? `${slug}.jpg`); }
+    catch (e) { setErr(errorMessage(e, 'Could not open the file.')); }
+    finally { setDlSlug(null); }
+  }
 
-  // One card image: the uploaded photo (fetched with the employee's token) or the placeholder.
+  // The uploaded photo (fetched with the employee's token) or the placeholder.
   const cardImage = (slug: string, aspect: string) => {
     const card = cardOf(slug);
     if (card?.onFile) {
       return (
-        <Image
-          source={{ uri: `${API_BASE_URL}/api/employee-app/me/cards/${slug}/download?v=${encodeURIComponent(card.uploadedAt ?? '')}`, headers: token ? { Authorization: `Bearer ${token}` } : undefined }}
-          className={`w-full ${aspect} rounded-xl`} contentFit="cover" cachePolicy="none"
-        />
+        <Pressable onPress={() => view(slug)}>
+          <Image
+            source={{ uri: `${API_BASE_URL}/api/employee-app/me/cards/${slug}/download?v=${encodeURIComponent(card.uploadedAt ?? '')}`, headers: token ? { Authorization: `Bearer ${token}` } : undefined }}
+            className={`w-full ${aspect} rounded-xl`} contentFit="cover" cachePolicy="none"
+          />
+        </Pressable>
       );
     }
     return <Art name={placeholder[slug]} className={`w-full ${aspect} rounded-xl`} />;
   };
-  const uploadLink = (slug: string) => (
-    <Pressable onPress={() => choose(slug)} disabled={!!busySlug} hitSlop={8}>
-      <Txt weight="semi" className="text-xs text-brand-dark">{busySlug === slug ? 'Uploading...' : cardOf(slug)?.onFile ? 'Replace' : 'Add photo'}</Txt>
-    </Pressable>
-  );
+  const onFileChip = (slug: string) => {
+    const on = !!cardOf(slug)?.onFile;
+    return (
+      <View className={`flex-row items-center gap-1 self-start rounded-full px-3 py-1 ${on ? 'bg-leaf-soft' : 'bg-[#eceef2]'}`}>
+        <Icon name={on ? 'checkmark-circle' : 'alert-circle'} size={16} color={on ? '#22844c' : '#9aa4b8'} />
+        <Txt weight="heavy" className={`text-xs ${on ? 'text-leaf' : 'text-[#6b7280]'}`}>{on ? 'Photo on file' : 'No photo yet'}</Txt>
+      </View>
+    );
+  };
+
+  // One permit/card: image, status, and Add/Replace + View buttons.
+  const permitCard = (slug: string, title: string, note: string, aspect = 'aspect-[1.5]') => {
+    const on = !!cardOf(slug)?.onFile;
+    return (
+      <Card className="gap-3">
+        <View className="flex-row gap-3">
+          <View className="w-28">{cardImage(slug, aspect)}</View>
+          <View className="flex-1 gap-1.5">
+            <Txt weight="heavy" className="text-lg">{title}</Txt>
+            {slug === 'olcc-permit' && olcc ? <StatusBadge status={permitStatus(olcc)} label={`HR: ${olcc.charAt(0).toUpperCase()}${olcc.slice(1)}`} /> : null}
+            {onFileChip(slug)}
+            <Txt className="text-xs leading-4 text-muted">{note}</Txt>
+          </View>
+        </View>
+        <View className="flex-row gap-2">
+          <Button title={busySlug === slug ? 'Uploading...' : on ? 'Replace photo' : 'Add photo'} icon="camera" variant={on ? 'outline' : 'green'} disabled={!!busySlug} onPress={() => choose(slug)} className="flex-1 rounded-2xl" />
+          {on && <Button title={dlSlug === slug ? 'Opening...' : 'View / save'} icon="download-outline" variant="green" loading={dlSlug === slug} onPress={() => view(slug)} className="flex-1 rounded-2xl" />}
+        </View>
+      </Card>
+    );
+  };
 
   return (
     <SafeAreaView edges={['bottom']} className="flex-1 bg-cream">
@@ -80,43 +118,12 @@ export default function PermitsScreen() {
         <Notice kind="error">{me.error ? errorMessage(me.error) : cardsQ.error ? errorMessage(cardsQ.error) : err}</Notice>
         {(me.isLoading || cardsQ.isLoading) && <Loading />}
 
-        <Card className="flex-row gap-4">
-          <View className="w-2/5 gap-1">
-            {cardImage('olcc-permit', 'aspect-[1.36]')}
-            <View className="items-center">{uploadLink('olcc-permit')}</View>
-          </View>
-          <View className="flex-1 gap-2">
-            <Txt weight="heavy" className="text-xl">OLCC worker permit</Txt>
-            <StatusBadge status={permitStatus(olcc)} label={olcc ? olcc.charAt(0).toUpperCase() + olcc.slice(1) : undefined} />
-            <Txt className="text-xs text-muted">HR keeps your permit status. Upload a photo so they have it on file.</Txt>
-          </View>
-        </Card>
+        {permitCard('olcc-permit', 'OLCC worker permit', 'Upload a clear photo of your permit so HR has it on file.', 'aspect-[1.36]')}
+        {permitCard('drivers-license-front', "Driver's license — Front", employee?.isDriver ? 'Required for drivers.' : 'Only needed if you drive for the company.')}
+        {permitCard('drivers-license-back', "Driver's license — Back", 'The back of your license.')}
+        {production && permitCard('food-handler', 'Food handler card', 'Required for the production team.', 'aspect-[1.57]')}
 
-        <Card className="flex-row gap-4">
-          <View className="w-2/5 flex-row gap-2">
-            <View className="flex-1 items-center gap-1">{cardImage('drivers-license-front', 'aspect-[1.5]')}<Txt className="text-xs text-muted">Front</Txt>{uploadLink('drivers-license-front')}</View>
-            <View className="flex-1 items-center gap-1">{cardImage('drivers-license-back', 'aspect-[1.5]')}<Txt className="text-xs text-muted">Back</Txt>{uploadLink('drivers-license-back')}</View>
-          </View>
-          <View className="flex-1 gap-1">
-            <Txt weight="heavy" className="text-xl">Driver&apos;s license</Txt>
-            <Txt className="text-xs text-muted">{employee?.isDriver ? 'Required for drivers.' : 'Only needed if you drive for the company.'}</Txt>
-          </View>
-        </Card>
-
-        {production && (
-          <Card className="flex-row gap-4">
-            <View className="w-2/5 gap-1">
-              {cardImage('food-handler', 'aspect-[1.57]')}
-              <View className="items-center">{uploadLink('food-handler')}</View>
-            </View>
-            <View className="flex-1 gap-1">
-              <Txt weight="heavy" className="text-xl">Food handler card</Txt>
-              <Txt className="text-xs text-muted">Required for the production team.</Txt>
-            </View>
-          </Card>
-        )}
-
-        <Txt className="mt-1 text-center text-xs text-muted">Tap “Add photo” on a card to take a photo or pick a file. HR reviews what you upload.</Txt>
+        <Txt className="mt-1 text-center text-xs text-muted">Add a photo or file; tap a photo to view it. HR reviews what you upload.</Txt>
       </Screen>
       {me.data && <Buddy me={me.data} docs={docs.data ?? []} production={production} />}
     </SafeAreaView>
