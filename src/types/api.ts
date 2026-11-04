@@ -43,6 +43,9 @@ export interface Punch {
   overtimeHours: number;
 }
 
+/** The four times on a punch that an employee can correct. */
+export type PunchTimes = Pick<Punch, 'clockIn' | 'mealOut' | 'mealIn' | 'clockOut'>;
+
 export interface WeekSummary {
   payPeriodStart: string;
   payPeriodEnd: string;

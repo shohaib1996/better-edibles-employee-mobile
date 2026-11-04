@@ -54,9 +54,10 @@ assets/art/            illustrations cut from the mockups
 
 ## Behaviour notes
 
-- **Route tab** shows for drivers only (`isDriver`). Drivers pick Driving or HR after sign-in.
+- **Driving or HR**: drivers (`isDriver`) pick one on sign-in and app open. Driving shows only the route; HR never shows it.
+- **Fix a punch**: the screen is built, but its button is commented out in `earnings/day/[date].tsx` until the backend has `PATCH /api/employee-app/me/timeclock/punches/:id`.
 - **Location** is read once, only when Clock in / Clock out is pressed. Never in the background.
 - **PIN**: if the time clock asks for one, the app shows a PIN box.
-- **Coming soon** (no database support yet): punch fix requests, time-off requests,
+- **Coming soon** (no database support yet): time-off requests,
   card photo uploads, profile edits, expenses, pay stub taxes/net pay, fingerprint sign-in.
   See `remaining.txt` in the Better-Edibles web repo for the full list and open questions.

@@ -1,6 +1,6 @@
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router'; // add `router` back with the Fix a punch button
 import { View } from 'react-native';
-import { Art, BackBar, Card, ComingSoon, Gradient, Icon, Loading, Notice, Screen, Txt } from '@/components/ui';
+import { Art, BackBar, Card, Gradient, Icon, Loading, Notice, Screen, Txt } from '@/components/ui'; // add `Button` back with the Fix a punch button
 import { errorMessage } from '@/lib/errors';
 import { clockTime, dayLabel, money } from '@/lib/format';
 import { useGetWeekQuery } from '@/store/api';
@@ -44,11 +44,18 @@ export default function DayDetailScreen() {
               </View>
             ))}
           </Card>
-          <View className="flex-row items-center gap-2">
-            <Icon name="lock-closed" size={16} color="#5d7391" />
-            <Txt className="text-muted">Times come straight from the company time clock.</Txt>
-          </View>
-          <ComingSoon title="Fix a punch">Ask your manager to correct a wrong or missing punch. Requests from the app are on the way.</ComingSoon>
+          {week.approved && (
+            <View className="flex-row items-center gap-2">
+              <Icon name="lock-closed" size={16} color="#5d7391" />
+              <Txt className="flex-1 text-muted">This pay week is approved, so its times are locked.</Txt>
+            </View>
+          )}
+          {/* Fix a punch: hidden until the backend has the PATCH endpoint (see README).
+              To turn it on, restore this button and the router and Button imports above.
+          {!week.approved && list.length > 0 && (
+            <Button title="Fix a punch" icon="time-outline" onPress={() => router.push(`/earnings/fix?date=${date}`)} />
+          )}
+          */}
         </>
       )}
     </Screen>

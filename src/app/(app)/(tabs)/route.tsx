@@ -13,6 +13,7 @@ import { useAppSelector } from '@/store';
 
 export default function RouteScreen() {
   const isDriver = useAppSelector((s) => !!s.auth.employee?.isDriver);
+  const driving = useAppSelector((s) => s.auth.mode === 'driving');
   // Stop order is set in the admin (Today's Contact); refresh every time this
   // screen is shown and every 30s while it is open, so reorders show up here.
   const route = useGetRouteQuery(undefined, { skip: !isDriver, pollingInterval: 30000, refetchOnMountOrArgChange: true });
@@ -26,7 +27,7 @@ export default function RouteScreen() {
   // const [msg, setMsg] = useState('');
   const [err, setErr] = useState('');
 
-  if (!isDriver) return <Redirect href="/" />;
+  if (!isDriver || !driving) return <Redirect href="/" />;
   if (route.isLoading || clock.isLoading) return <Screen><Loading /></Screen>;
   const stops = route.data ?? [];
   const left = stops.filter((s) => !s.done);
@@ -35,7 +36,7 @@ export default function RouteScreen() {
   // Not clocked in yet: "Ready to roll?"
   if (clock.data?.status === 'clocked_out') {
     return (
-      <Screen onRefresh={() => { route.refetch(); clock.refetch(); }}>
+      <Screen edges={['top', 'bottom']} onRefresh={() => { route.refetch(); clock.refetch(); }}>
         {/* Blue dawn sky fading to cream, matching the web `.ready` background. */}
         <Gradient colors={['#d9ecfb', '#f3f8fd', '#fff8ec']} locations={[0, 0.3, 0.6]} className="absolute -left-4 -right-4 -top-2 h-[420px]" />
         <BackBar to="/choice" right={<View className="rounded-full bg-[#e7e7f2] px-4 py-1.5"><Txt weight="semi" className="text-sm text-navy-soft">Not clocked in</Txt></View>} />
@@ -94,6 +95,7 @@ export default function RouteScreen() {
         <Art name="stopMap" className="aspect-[2.85] w-full" contentFit="cover" />
         <SafeAreaView edges={['top']} className="absolute inset-x-0 top-0">
           <View className="flex-row items-start justify-center px-3">
+            <Pressable onPress={() => router.replace('/choice')} accessibilityRole="button" accessibilityLabel="Back to Driving or HR" className="absolute left-3 top-1 h-12 w-12 items-center justify-center rounded-full bg-white"><Icon name="chevron-back" /></Pressable>
             {next && <View className="mt-2 rounded-full bg-white px-5 py-2"><Txt weight="heavy">Stop {next.order} of {stops.length}</Txt></View>}
             <Link href="/route/stops" asChild>
               <Pressable accessibilityLabel="All stops" className="absolute right-3 top-1 h-12 w-12 items-center justify-center rounded-full bg-white"><Icon name="list" /></Pressable>
@@ -101,7 +103,7 @@ export default function RouteScreen() {
           </View>
         </SafeAreaView>
       </View>
-      <Screen edges={[]} onRefresh={route.refetch} contentClassName="-mt-4">
+      <Screen edges={['bottom']} onRefresh={route.refetch} contentClassName="-mt-4">
         <Card className="gap-2">
           {/* Navigator voice assistant — coming soon, hidden for now.
           <View className="flex-row items-center justify-end gap-2">

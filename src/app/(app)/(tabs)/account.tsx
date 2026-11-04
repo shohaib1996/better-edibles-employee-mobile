@@ -71,6 +71,7 @@ export default function AccountScreen() {
       <Row art="acctFinger" title="Fingerprint sign-in" sub="Coming soon" />
       <Row art="acctCloud" title="App updates" sub="Version 1.0 · updates come through the app store" />
       <Row art="acctHr" title="HR documents" href="/documents" />
+      {employee?.isDriver && <Row art="choiceDriving" title="Switch to Driving" sub="Go back to the Driving or HR screen" onPress={() => router.replace('/choice')} />}
       <Button title="Sign out" icon="log-out-outline" variant="outline" onPress={signOut} className="mx-6 mt-2" />
     </Screen>
   );

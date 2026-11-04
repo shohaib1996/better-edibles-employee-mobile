@@ -1,7 +1,7 @@
 import type { DocStatus, HrDoc } from '@/types/api';
 
 // The company works on Pacific time; show every time and day that way.
-const TZ = 'America/Los_Angeles';
+export const TZ = 'America/Los_Angeles';
 
 export const money = (n: number) => n.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
 export const hours = (n: number) => `${n.toFixed(2)} hrs`;

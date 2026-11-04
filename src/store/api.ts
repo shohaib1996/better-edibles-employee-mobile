@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery, type BaseQueryFn, type FetchArgs, type Fetch
 import { API_BASE_URL } from '@/lib/config';
 import { tokenStorage } from '@/lib/tokenStorage';
 import type {
-  ClockAction, ClockState, Employee, HrDoc, LocationSnapshot, MeResponse, PayHistory, PayRun, PermitCard, Stop, TimeOffRequest, Transcription, WeekSummary,
+  ClockAction, ClockState, Employee, HrDoc, LocationSnapshot, MeResponse, PayHistory, PayRun, PermitCard, PunchTimes, Stop, TimeOffRequest, Transcription, WeekSummary,
 } from '@/types/api';
 import { signedOut } from './authSlice';
 import type { RootState } from './index';
@@ -83,6 +83,11 @@ export const employeeApi = createApi({
       query: (payPeriodStart) => me(`/week${payPeriodStart ? `?payPeriodStart=${payPeriodStart}` : ''}`),
       providesTags: ['Week'],
     }),
+    // Sends only the times that changed, as ISO strings. Hours and pay come back from the server.
+    fixPunch: b.mutation<void, { id: string } & Partial<Record<keyof PunchTimes, string>>>({
+      query: ({ id, ...body }) => ({ url: me(`/timeclock/punches/${id}`), method: 'PATCH', body }),
+      invalidatesTags: ['Week', 'Clock', 'Pay'],
+    }),
     getPayHistory: b.query<PayHistory, void>({ query: () => me('/pay-runs'), providesTags: ['Pay'] }),
     getPayRun: b.query<PayRun, string>({
       query: (payPeriodStart) => me(`/pay-runs/${payPeriodStart}`),
@@ -133,7 +138,7 @@ export const employeeApi = createApi({
 
 export const {
   useLoginMutation, useRequestPasswordResetMutation, useGetMeQuery, useUpdateProfileMutation, useGetClockStateQuery, usePunchMutation,
-  useGetWeekQuery, useGetPayHistoryQuery, useGetPayRunQuery, useListDocsQuery, useDeleteDocMutation, useListCardsQuery, useGetRouteQuery,
+  useGetWeekQuery, useFixPunchMutation, useGetPayHistoryQuery, useGetPayRunQuery, useListDocsQuery, useDeleteDocMutation, useListCardsQuery, useGetRouteQuery,
   useListTimeOffQuery, useCreateTimeOffMutation, useCancelTimeOffMutation,
   useMarkArrivedMutation, useTranscribeMutation, useSaveVoiceNoteMutation,
 } = employeeApi;

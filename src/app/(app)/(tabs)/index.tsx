@@ -1,7 +1,7 @@
-import { Link, router } from 'expo-router';
+import { Link, Redirect, router } from 'expo-router';
 import { useEffect } from 'react';
 import { Pressable, View } from 'react-native';
-import { Art, ComingSoon, Notice, Screen, Txt } from '@/components/ui';
+import { Art, Notice, Screen, Txt } from '@/components/ui'; // add `ComingSoon` back with Expenses
 import { ClockCard } from '@/features/clock/ClockCard';
 import { PinPrompt } from '@/features/clock/PinPrompt';
 import { usePunch } from '@/features/clock/usePunch';
@@ -28,8 +28,9 @@ export default function HomeScreen() {
   const dispatch = useAppDispatch();
   const employee = useAppSelector((s) => s.auth.employee);
   const landing = useAppSelector((s) => s.auth.landing);
+  const driving = useAppSelector((s) => s.auth.mode === 'driving');
 
-  // Fresh sign-in for a driver: send them to the Driving/HR choice once. Done
+  // Sign-in or app open for a driver: send them to the Driving/HR choice once. Done
   // here (not in login) so the navigator is mounted and the redirect can't race.
   useEffect(() => {
     if (landing === 'choice') {
@@ -42,6 +43,8 @@ export default function HomeScreen() {
   const punch = usePunch();
   const first = firstName(employee?.name);
   const onFile = docs.data?.filter((d) => d.onFile).length ?? 0;
+
+  if (driving) return <Redirect href="/route" />;
 
   return (
     <Screen onRefresh={() => { clock.refetch(); docs.refetch(); }} refreshing={clock.isFetching && !clock.isLoading}>
@@ -66,8 +69,10 @@ export default function HomeScreen() {
         <Tile href="/account" art="homeAccount" title="Account" sub="Profile and settings" bg="bg-tile-acct" />
       </View>
 
+      {/* Expenses: hidden until it's built. To turn it on, restore this and the ComingSoon import above.
       <Txt weight="heavy" className="mt-2 text-xl">Expenses</Txt>
       <ComingSoon title="Add an expense">Snap a receipt and send it to Accounting. For now, give receipts to your manager.</ComingSoon>
+      */}
     </Screen>
   );
 }
